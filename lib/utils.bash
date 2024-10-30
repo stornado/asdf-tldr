@@ -37,12 +37,22 @@ list_all_versions() {
 }
 
 download_release() {
-	local version filename url
+	local version filename url platform architecture
 	version="$1"
 	filename="$2"
 
+	case "$OSTYPE" in
+	linux*) platform="linux" ;;
+	*) fail "Unsupported platform" ;;
+	esac
+
+	case "$(uname -m)" in
+	x86_64*) architecture="x86_64" ;;
+	*) fail "Unsupported architecture" ;;
+	esac
+
 	# TODO: Adapt the release URL convention for tldr
-	url="$GH_REPO/archive/v${version}.tar.gz"
+	url="$GH_REPO/releases/download/v${version}/tlrc-v${version}-${architecture}-unknown-${platform}-musl.tar.gz"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
